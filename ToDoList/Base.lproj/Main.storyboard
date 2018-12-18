@@ -150,11 +150,12 @@
                             <constraint firstItem="kQt-Tg-j4F" firstAttribute="leading" secondItem="Yf0-BO-XbD" secondAttribute="leading" constant="16" id="HfH-x6-YYl"/>
                             <constraint firstItem="kQt-Tg-j4F" firstAttribute="top" secondItem="Yf0-BO-XbD" secondAttribute="top" id="JAR-av-IEl"/>
                             <constraint firstItem="Yf0-BO-XbD" firstAttribute="trailing" secondItem="kQt-Tg-j4F" secondAttribute="trailing" constant="16" id="n0W-hr-kLA"/>
-                            <constraint firstAttribute="bottomMargin" secondItem="Xmv-Gm-8Jd" secondAttribute="bottom" id="ne4-zB-zWD"/>
+                            <constraint firstAttribute="bottom" secondItem="Xmv-Gm-8Jd" secondAttribute="bottom" id="ne4-zB-zWD"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="Yf0-BO-XbD"/>
                     </view>
                     <connections>
+                        <outlet property="bottomConstraint" destination="ne4-zB-zWD" id="Vx5-2R-Hqh"/>
                         <outlet property="doneButton" destination="d2w-Cm-gB4" id="rBb-a2-kY8"/>
                         <outlet property="segmentedControl" destination="rym-58-ZRo" id="zsp-Mx-JlX"/>
                         <outlet property="textView" destination="23X-zw-sdw" id="5L1-Oj-cJV"/>

@@ -24,16 +24,24 @@ class AddTodoViewController: UIViewController {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow(with:)),
-            name: .UIKeyboardWillShow,
+            name: UIResponder.keyboardWillShowNotification,
             object: nil
         )
     }
     
     // MARK: Actions
     @objc func keyboardWillShow(with notification: Notification) {
-        guard let keyboardFrame = notification.userInfo?[""] as? NSValue else { return } // NSValue - objc wrapper
+        let key = "UIKeyboardFrameEndUserInfoKey"
+        guard let keyboardFrame = notification.userInfo?[key] as? NSValue else { return } // NSValue - objc wrapper
         
-        let keyboardHeight = keyboardFrame.cgRectValue.height
+        let keyboardHeight = keyboardFrame.cgRectValue.height + 16 // add 16 point margin
+        
+        bottomConstraint.constant = keyboardHeight
+        
+        UIView.animate(withDuration: 0.3) {
+            // resets the constraints
+            self.view.layoutIfNeeded()
+        }
         
     }
     
