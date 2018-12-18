@@ -33,6 +33,8 @@ class TodoTableViewController: UITableViewController {
             cacheName: nil
         )
         
+        resultsController.delegate = self
+        
         // fetch
         do {
             try resultsController.performFetch()
@@ -44,8 +46,7 @@ class TodoTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return resultsController.sections?[section].objects?.count ?? 0
+        return resultsController.sections?[section].numberOfObjects ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -86,7 +87,6 @@ class TodoTableViewController: UITableViewController {
         return UISwipeActionsConfiguration(actions: [action])
     }
 
-    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -94,9 +94,29 @@ class TodoTableViewController: UITableViewController {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
         if let _ = sender as? UIBarButtonItem, let viewController = segue.destination as? AddTodoViewController {
-            viewController.managedContext = coreDataStack.manageContext
+            // use the resultsController delegate managed context which has a copy of our data context
+            viewController.managedContext = resultsController.managedObjectContext
         }
     }
- 
+}
 
+extension TodoTableViewController: NSFetchedResultsControllerDelegate {
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.beginUpdates()
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        tableView.endUpdates()
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+            case .insert:
+                if let indexPath = newIndexPath {
+                    tableView.insertRows(at: [indexPath], with: .automatic)
+                }
+            default:
+                break
+            }
+    }
 }

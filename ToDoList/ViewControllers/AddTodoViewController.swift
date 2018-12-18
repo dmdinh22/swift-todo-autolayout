@@ -51,9 +51,13 @@ class AddTodoViewController: UIViewController {
         
     }
     
-    @IBAction func cancel(_ sender: Any) {
+    fileprivate func dismissAndResign() {
         dismiss(animated: true)
-        textView.resignFirstResponder() // hide keyboard
+        textView.resignFirstResponder()
+    }
+    
+    @IBAction func cancel(_ sender: Any) {
+        dismissAndResign() 
     }
     
     @IBAction func done(_ sender: Any) {
@@ -68,24 +72,11 @@ class AddTodoViewController: UIViewController {
         
         do {
             try? managedContext.save()
-            dismiss(animated: true) // only dismiss on successful save
-            textView.resignFirstResponder() // hide keyboard
+            dismissAndResign()
         } catch {
             print("Error saving todo: \(error)")
         }
-
     }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 
 extension AddTodoViewController: UITextViewDelegate {
