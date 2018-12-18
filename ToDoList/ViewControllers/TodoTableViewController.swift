@@ -16,7 +16,7 @@ class TodoTableViewController: UITableViewController {
     // managed our managed objects (todos) and update tableview
     var resultsController: NSFetchedResultsController<Todo>!
     let coreDataStack = CoreDataStack()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -42,20 +42,20 @@ class TodoTableViewController: UITableViewController {
             print("Perform fetch error: \(error)")
         }
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return resultsController.sections?[section].numberOfObjects ?? 0
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
-
+        
         // Configure the cell...
         let todo = resultsController.object(at: indexPath)
         cell.textLabel?.text = todo.title
-
+        
         return cell
     }
     
@@ -85,7 +85,15 @@ class TodoTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .destructive, title: "Check") { (action, view, completion) in
             // TODO: check todo
-            completion(true)
+            let todo = self.resultsController.object(at: indexPath)
+            self.resultsController.managedObjectContext.delete(todo)
+            do {
+                try? self.resultsController.managedObjectContext.save()
+                completion(true)
+            } catch {
+                print("Error deleting todo: \(error)")
+                completion(false)
+            }
         }
         
         //action.image = UIImage(named: "check.png")
@@ -94,9 +102,14 @@ class TodoTableViewController: UITableViewController {
         
         return UISwipeActionsConfiguration(actions: [action])
     }
-
+    
+    // segue on tap of cell
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "showAddTodo", sender: tableView.cellForRow(at: indexPath))
+    }
+    
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
@@ -104,6 +117,14 @@ class TodoTableViewController: UITableViewController {
         if let _ = sender as? UIBarButtonItem, let viewController = segue.destination as? AddTodoViewController {
             // use the resultsController delegate managed context which has a copy of our data context
             viewController.managedContext = resultsController.managedObjectContext
+        }
+        
+        if let cell = sender as? UITableViewCell, let viewController = segue.destination as? AddTodoViewController {
+            viewController.managedContext = resultsController.managedObjectContext
+            if let indexPath = tableView.indexPath(for: cell) {
+                let todo = resultsController.object(at: indexPath)
+                viewController.todo = todo
+            }
         }
     }
 }
@@ -119,16 +140,21 @@ extension TodoTableViewController: NSFetchedResultsControllerDelegate {
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         switch type {
-            case .insert:
-                if let indexPath = newIndexPath {
-                    tableView.insertRows(at: [indexPath], with: .automatic)
-                }
-            case .delete:
-                if let indexPath = newIndexPath {
-                    tableView.deleteRows(at: [indexPath], with: .automatic)
-                }
-            default:
-                break
+        case .insert:
+            if let indexPath = newIndexPath {
+                tableView.insertRows(at: [indexPath], with: .automatic)
             }
+        case .update:
+            if let indexPath = indexPath, let cell = tableView.cellForRow(at: indexPath) {
+                let todo = resultsController.object(at: indexPath)
+                cell.textLabel?.text = todo.title
+            }
+        case .delete:
+            if let indexPath = newIndexPath {
+                tableView.deleteRows(at: [indexPath], with: .automatic)
+            }
+        default:
+            break
+        }
     }
 }

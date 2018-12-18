@@ -13,6 +13,7 @@ class AddTodoViewController: UIViewController {
     
     // MARK: - Properties
     var managedContext: NSManagedObjectContext! // ! to force unwrap
+    var todo: Todo?
     
     // MARK: - Outlets
 
@@ -33,6 +34,13 @@ class AddTodoViewController: UIViewController {
         )
         
         textView.becomeFirstResponder() // open modal with keyboard
+        
+        // set data on modal if todo exists
+        if let todo = todo {
+            textView.text = todo.title
+            textView.text = todo.title // bug that removes the text because delegate removes the data
+            segmentedControl.selectedSegmentIndex = Int(todo.priority)
+        }
     }
     
     // MARK: - Actions
@@ -48,7 +56,6 @@ class AddTodoViewController: UIViewController {
             // resets the constraints
             self.view.layoutIfNeeded()
         }
-        
     }
     
     fileprivate func dismissAndResign() {
@@ -65,10 +72,16 @@ class AddTodoViewController: UIViewController {
             return
         }
         
-        let todo = Todo(context: managedContext)
-        todo.title = title
-        todo.priority = Int16(segmentedControl.selectedSegmentIndex)
-        todo.date = Date()
+        // check if todo already exists for update
+        if let todo = self.todo {
+            todo.title = title
+            todo.priority = Int16(segmentedControl.selectedSegmentIndex)
+        } else {
+            let todo = Todo(context: managedContext)
+            todo.title = title
+            todo.priority = Int16(segmentedControl.selectedSegmentIndex)
+            todo.date = Date()
+        }
         
         do {
             try? managedContext.save()
