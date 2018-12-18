@@ -7,25 +7,53 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoTableViewController: UITableViewController {
+    
+    // MARK: - Properties
+    
+    // managed our managed objects (todos) and update tableview
+    var resultsController: NSFetchedResultsController<Todo>!
+    let coreDataStack = CoreDataStack()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        // request
+        let request: NSFetchRequest<Todo> = Todo.fetchRequest()
+        let sortDescriptors = NSSortDescriptor(key: "date", ascending: true) // sort by date asc
+        request.sortDescriptors = [sortDescriptors]
+        
+        // initialize
+        resultsController = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: coreDataStack.manageContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        
+        // fetch
+        do {
+            try resultsController.performFetch()
+        } catch {
+            print("Perform fetch error: \(error)")
+        }
     }
 
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 10
+        return resultsController.sections?[section].objects?.count ?? 0
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoCell", for: indexPath)
 
         // Configure the cell...
+        let todo = resultsController.object(at: indexPath)
+        cell.textLabel?.text = todo.title
 
         return cell
     }
