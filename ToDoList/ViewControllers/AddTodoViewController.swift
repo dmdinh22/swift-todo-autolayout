@@ -27,6 +27,8 @@ class AddTodoViewController: UIViewController {
             name: UIResponder.keyboardWillShowNotification,
             object: nil
         )
+        
+        textView.becomeFirstResponder() // open modal with keyboard
     }
     
     // MARK: Actions
@@ -47,9 +49,11 @@ class AddTodoViewController: UIViewController {
     
     @IBAction func cancel(_ sender: Any) {
         dismiss(animated: true)
+        textView.resignFirstResponder() // hide keyboard
     }
     
     @IBAction func done(_ sender: Any) {
+        dismiss(animated: true)
     }
     
     /*
@@ -62,4 +66,19 @@ class AddTodoViewController: UIViewController {
     }
     */
 
+}
+
+extension AddTodoViewController: UITextViewDelegate {
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        if doneButton.isHidden {
+            textView.text.removeAll()
+            textView.textColor = .white
+            
+            doneButton.isHidden = false
+            
+            UIView.animate(withDuration: 0.3) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
 }
