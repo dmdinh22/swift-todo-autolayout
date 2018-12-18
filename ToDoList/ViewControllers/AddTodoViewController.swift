@@ -7,10 +7,14 @@
 //
 
 import UIKit
+import CoreData
 
 class AddTodoViewController: UIViewController {
     
-    // MARK: Outlets
+    // MARK: - Properties
+    var managedContext: NSManagedObjectContext! // ! to force unwrap
+    
+    // MARK: - Outlets
 
     @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var segmentedControl: UISegmentedControl!
@@ -31,7 +35,7 @@ class AddTodoViewController: UIViewController {
         textView.becomeFirstResponder() // open modal with keyboard
     }
     
-    // MARK: Actions
+    // MARK: - Actions
     @objc func keyboardWillShow(with notification: Notification) {
         let key = "UIKeyboardFrameEndUserInfoKey"
         guard let keyboardFrame = notification.userInfo?[key] as? NSValue else { return } // NSValue - objc wrapper
@@ -53,7 +57,23 @@ class AddTodoViewController: UIViewController {
     }
     
     @IBAction func done(_ sender: Any) {
-        dismiss(animated: true)
+        guard let title = textView.text, !title.isEmpty else {
+            return
+        }
+        
+        let todo = Todo(context: managedContext)
+        todo.title = title
+        todo.priority = Int16(segmentedControl.selectedSegmentIndex)
+        todo.date = Date()
+        
+        do {
+            try? managedContext.save()
+            dismiss(animated: true) // only dismiss on successful save
+            textView.resignFirstResponder() // hide keyboard
+        } catch {
+            print("Error saving todo: \(error)")
+        }
+
     }
     
     /*
