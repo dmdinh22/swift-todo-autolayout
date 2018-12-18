@@ -64,7 +64,15 @@ class TodoTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
             // TODO: delete todo
-            completion(true)
+            let todo = self.resultsController.object(at: indexPath)
+            self.resultsController.managedObjectContext.delete(todo)
+            do {
+                try? self.resultsController.managedObjectContext.save()
+                completion(true)
+            } catch {
+                print("Error deleting todo: \(error)")
+                completion(false)
+            }
         }
         
         //action.image = UIImage(named: "trash.png")
@@ -114,6 +122,10 @@ extension TodoTableViewController: NSFetchedResultsControllerDelegate {
             case .insert:
                 if let indexPath = newIndexPath {
                     tableView.insertRows(at: [indexPath], with: .automatic)
+                }
+            case .delete:
+                if let indexPath = newIndexPath {
+                    tableView.deleteRows(at: [indexPath], with: .automatic)
                 }
             default:
                 break
