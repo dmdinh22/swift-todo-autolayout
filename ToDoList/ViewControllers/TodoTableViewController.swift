@@ -114,7 +114,7 @@ class TodoTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if let _ = sender as? UIBarButtonItem, let viewController = segue.destination as? AddTodoViewController {
+        if sender is UIBarButtonItem, let viewController = segue.destination as? AddTodoViewController {
             // use the resultsController delegate managed context which has a copy of our data context
             viewController.managedContext = resultsController.managedObjectContext
         }
