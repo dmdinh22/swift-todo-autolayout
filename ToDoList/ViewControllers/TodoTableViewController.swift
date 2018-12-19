@@ -28,7 +28,7 @@ class TodoTableViewController: UITableViewController {
         // initialize
         resultsController = NSFetchedResultsController(
             fetchRequest: request,
-            managedObjectContext: coreDataStack.manageContext,
+            managedObjectContext: coreDataStack.managedContext,
             sectionNameKeyPath: nil,
             cacheName: nil
         )
@@ -63,14 +63,13 @@ class TodoTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .destructive, title: "Delete") { (action, view, completion) in
-            // TODO: delete todo
             let todo = self.resultsController.object(at: indexPath)
             self.resultsController.managedObjectContext.delete(todo)
             do {
-                try? self.resultsController.managedObjectContext.save()
+                try self.resultsController.managedObjectContext.save()
                 completion(true)
             } catch {
-                print("Error deleting todo: \(error)")
+                print("delete failed: \(error)")
                 completion(false)
             }
         }
@@ -84,14 +83,13 @@ class TodoTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let action = UIContextualAction(style: .destructive, title: "Check") { (action, view, completion) in
-            // TODO: check todo
             let todo = self.resultsController.object(at: indexPath)
             self.resultsController.managedObjectContext.delete(todo)
             do {
-                try? self.resultsController.managedObjectContext.save()
+                try self.resultsController.managedObjectContext.save()
                 completion(true)
             } catch {
-                print("Error deleting todo: \(error)")
+                print("delete failed: \(error)")
                 completion(false)
             }
         }
@@ -150,7 +148,7 @@ extension TodoTableViewController: NSFetchedResultsControllerDelegate {
                 cell.textLabel?.text = todo.title
             }
         case .delete:
-            if let indexPath = newIndexPath {
+            if let indexPath = indexPath {
                 tableView.deleteRows(at: [indexPath], with: .automatic)
             }
         default:

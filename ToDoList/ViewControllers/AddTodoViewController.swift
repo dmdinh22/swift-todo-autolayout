@@ -84,7 +84,7 @@ class AddTodoViewController: UIViewController {
         }
         
         do {
-            try? managedContext.save()
+            try managedContext.save()
             dismissAndResign()
         } catch {
             print("Error saving todo: \(error)")

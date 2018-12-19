@@ -22,7 +22,7 @@ class CoreDataStack {
         return container
     }
     // manage (save/delete) collection of managed objects (todos)
-    var manageContext: NSManagedObjectContext {
+    var managedContext: NSManagedObjectContext {
         return container.viewContext
     }
 }
