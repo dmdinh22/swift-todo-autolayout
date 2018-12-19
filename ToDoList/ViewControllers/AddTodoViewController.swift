@@ -17,10 +17,10 @@ class AddTodoViewController: UIViewController {
     
     // MARK: - Outlets
 
-    @IBOutlet weak var textView: UITextView!
-    @IBOutlet weak var segmentedControl: UISegmentedControl!
-    @IBOutlet weak var doneButton: UIButton!
-    @IBOutlet weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet var textView: UITextView!
+    @IBOutlet var segmentedControl: UISegmentedControl!
+    @IBOutlet var doneButton: UIButton!
+    @IBOutlet var bottomConstraint: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
